@@ -1,62 +1,38 @@
-
+version: "3.9"
 
 services:
-  app:
-    build:
-      context: ./  # Diretório atual como contexto de build
-      dockerfile: docker/php/DockerFile  # Localização do Dockerfile para o serviço PHP
-    container_name: cadstro-app  # Nome do container
-    restart: always  # Reinicia o container automaticamente em caso de falha
-    working_dir: /var/www/  # Define o diretório de trabalho dentro do container
-    volumes:
-      - ./:/var/www  # Sincroniza o diretório atual com /var/www no container
-      - ./application:/var/www/application  # Sincroniza a pasta 'application' local com o container
-    environment:
-      - COMPOSER_HOME=/composer  # Define o diretório do Composer
-      - COMPOSER_ALLOW_SUPERUSER=1  # Permite uso do Composer como superusuário
-      - APP_ENV=local  # Define o ambiente da aplicação como 'local'
-      - APP_KEY=base64:9HuFZLpCdvZJRCeGmqwkf/uXPZOJ3FqHm9ijR5oxkm0=  # Chave de segurança da aplicação Laravel
+  laravelapp:
+    container_name: back-end
+    image: back-endphp
+    build: .
+    ports:
+      - "8081:80"
+    env_file:
+      - .env
     depends_on:
-      - db  # Define dependência do serviço 'db' (Postgres)
-      - redis  # Define dependência do serviço 'redis'
-
-  nginx:
-    image: nginx:1.25.1-alpine-slim  # Imagem Nginx para servir a aplicação
-    container_name: cadstro-nginx  # Nome do container Nginx
-    restart: always  # Reinicia automaticamente em caso de falha
-    ports:
-      - "8000:80"  # Mapeia a porta 8000 do host para a porta 80 do container (acesso pelo localhost:8000)
+      - db
     volumes:
-      - ./:/var/www  # Sincroniza o diretório atual com /var/www no container
-      - ./application:/var/www/application  # Sincroniza a pasta 'application' local com o container
-      - ./docker/nginx:/etc/nginx/conf.d  # Sincroniza os arquivos de configuração do Nginx
-
-  redis:
-    build:
-      context: ./  # Diretório atual como contexto de build
-      dockerfile: docker/redis/DockerFile  # Dockerfile específico para o serviço Redis
-    container_name: cadstro-redis  # Nome do container Redis
-    restart: always  # Reinicia automaticamente em caso de falha
-    ports:
-      - "6379:6379"  # Mapeia a porta 6379 do host para a porta 6379 do Redis (usada para conexões com Redis)
-    volumes:
-      - redis:/data  # Volume persistente para armazenar os dados do Redis
+      - ./src:/var/www/html
+    networks:
+      - laravel-network
 
   db:
-    build:
-      context: ./  # Diretório atual como contexto de build
-      dockerfile: docker/db/DockerFile  # Dockerfile específico para o banco de dados
-    container_name: cadstro-db  # Nome do container para o banco de dados
-    restart: always  # Reinicia automaticamente em caso de falha
-    environment:
-      - POSTGRES_DB=Emmy  # Nome do banco de dados Postgres
-      - POSTGRES_USER=postgres  # Usuário do banco de dados Postgres
-      - POSTGRES_PASSWORD=postgres  # Senha do usuário Postgres
+    container_name: db
+    image: postgres:12
     ports:
-      - "5432:5432"  # Mapeia a porta 5432 do host para a porta 5432 do container (acesso ao Postgres)
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: emmy
     volumes:
-      - db:/var/lib/postgresql/data  # Volume persistente para armazenar os dados do banco
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - laravel-network
 
 volumes:
-  redis:  # Define o volume persistente para o Redis
-  db:  # Define o volume persistente para o banco de dados
+  pgdata: {}
+
+networks:
+  laravel-network:
+    driver: bridge

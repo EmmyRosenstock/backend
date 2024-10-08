@@ -1,6 +1,0 @@
-{
-    "require": {
-        "laravel/passport": "^12.3",
-        "laravel/sanctum": "^4.0"
-    }
-}
