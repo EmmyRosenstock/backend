@@ -64,5 +64,5 @@ Isso criará as tabelas necessárias para o funcionamento da aplicação.
 Com tudo pronto, você pode acessar a aplicação no navegador:
 
 
-http://localhost:8000
+(http://localhost:8000/api/documentation#/)
 A aplicação estará disponível localmente rodando na porta 8000, conforme configurado no arquivo docker-compose.yml.
