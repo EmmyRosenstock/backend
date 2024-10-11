@@ -17,8 +17,8 @@ class UserController extends Controller
  *         description="Detalhes do usuário",
  *         @OA\JsonContent(
  *             @OA\Property(property="id", type="integer", example=1),
- *             @OA\Property(property="name", type="string", example="John Doe"),
- *             @OA\Property(property="email", type="string", format="email", example="user@example.com")
+ *
+ *             @OA\Property(property="nome", type="string", format="email", example="user@example.com")
  *         )
  *     ),
  *     @OA\Response(
@@ -33,8 +33,8 @@ class UserController extends Controller
         // Retornar detalhes do usuário logado
         return response()->json([
             'id' => 1,
-            'name' => 'John Doe',
-            'email' => 'user@example.com'
+            'name' => 'user@example.com'
+
         ], 200);
     }
 
